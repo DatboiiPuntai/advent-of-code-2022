@@ -5,18 +5,16 @@ def main():
     rucksacks = lines.split('\n')
 
     # part 1
+    totalSum = 0
     rucksackCompartments = [(rucksack[:len(rucksack)//2], rucksack[len(rucksack)//2:])
                             for rucksack in rucksacks]
-    shared = []
     for rucksack in rucksackCompartments:
-        shared.append(list(set(rucksack[0]) & set(rucksack[1]))[0])
-
-    totalSum = 0
-    for letter in shared:
-        if letter.isupper():
-            totalSum += ord(letter) - 38
+        shared = list(set(rucksack[0]) & set(rucksack[1]))[0]
+        if shared.isupper():
+            totalSum += ord(shared) - 38
         else:
-            totalSum += ord(letter) - 96
+            totalSum += ord(shared) - 96
+        
     print(totalSum)
 
     # part 2
