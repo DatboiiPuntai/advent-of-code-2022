@@ -12,7 +12,7 @@ def main():
             chars.append(c)
         else:
             chars.append(c)
-        
+         
         if len(chars) == 14:
             print(i+1)
             break
