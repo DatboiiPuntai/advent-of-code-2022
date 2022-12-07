@@ -31,11 +31,11 @@ def diskUsage(file_sizes: dict[Path, int]):
     return directory_sizes
 
 def main():
-    input_str = read_input(day=7, test=True)
+    input_str = read_input(day=7)
     directory_sizes = parse(input_str)
     # part 1
     sizeSum = 0
-    for path, size in directory_sizes.items():
+    for size in directory_sizes.values():
         if size <= 100000:
             sizeSum += size
     print(sizeSum)
@@ -43,7 +43,7 @@ def main():
     # part 2
     free_space = TOTAL_SPACE - directory_sizes[ROOT.resolve()]
     missing_space = REQUIRED_SPACE - free_space
-    return min(size for size in directory_sizes.values() if size >= missing_space)
+    print(min(size for size in directory_sizes.values() if size >= missing_space))
 
 
 
