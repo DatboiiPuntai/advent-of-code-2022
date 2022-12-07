@@ -1,6 +1,7 @@
+from utils import read_input
+
 def main():
-    with open(r'D:\Users\Pantai Suyasri\Documents\Programming\advent-of-code-2022\Day3\input.txt', 'r') as f:
-        lines = f.read()
+    lines = read_input(day=3)
 
     rucksacks = lines.split('\n')
 

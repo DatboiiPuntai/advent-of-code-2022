@@ -1,6 +1,7 @@
+from utils import read_input
+
 def main():
-    with open(r'Day6\input.txt', 'r') as f:
-        line = f.read()
+    line = read_input(day=6)
     
     chars = []
     for i in range(len(line)):

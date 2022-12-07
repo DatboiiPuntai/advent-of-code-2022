@@ -1,10 +1,10 @@
+from utils import read_input
+
 WIDTH = 9
 
 
 def main():
-    with open(r'Day5\input.txt', 'r') as f:
-        lines = f.read()
-
+    lines = read_input(day=5)
     diagram, instructions = lines.split('\n\n')
 
     stacks = [[] for _ in range(WIDTH)]

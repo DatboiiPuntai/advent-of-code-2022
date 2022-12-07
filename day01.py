@@ -1,6 +1,7 @@
+from utils import read_input
+
 def main():
-    with open('input.txt', 'r') as f:
-        lines = f.read()
+    lines = read_input(day=1)
     elves = lines.split('\n\n')
 
     calories = []
