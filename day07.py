@@ -7,6 +7,7 @@ ROOT = Path("/")
 TOTAL_SPACE = 70000000
 REQUIRED_SPACE = 30000000
 
+
 def parse(input_str: str):
     file_sizes = defaultdict(dict)
     path = ROOT
@@ -14,7 +15,7 @@ def parse(input_str: str):
     for line in input_str.splitlines():
         cmd = line.split()
         if cmd[0] == '$':
-            if cmd[1] == 'ls': 
+            if cmd[1] == 'ls':
                 continue
             path = (path / Path(cmd[2])).resolve()
         else:
@@ -23,15 +24,20 @@ def parse(input_str: str):
                 file_sizes[path / name] = int(kind)
     return diskUsage(file_sizes)
 
+
 def diskUsage(file_sizes: dict[Path, int]):
-    directory_sizes = defaultdict(int)
+    folderSizes = defaultdict(int)
     for path, size in file_sizes.items():
+        print(f"{path}: {size}")
         for parent in path.parents:
-            directory_sizes[parent] += size
-    return directory_sizes
+            print(f"{parent} += {size}")
+            folderSizes[parent] += size
+    return folderSizes
+
 
 def main():
     input_str = read_input(day=7)
+    print(parse(input_str))
     directory_sizes = parse(input_str)
     # part 1
     sizeSum = 0
@@ -46,7 +52,11 @@ def main():
     print(min(size for size in directory_sizes.values() if size >= missing_space))
 
 
-
-
 if __name__ == '__main__':
     main()
+
+    # directory_sizes = defaultdict(int)
+    # for path, size in file_sizes.items():
+    #     for parent in path.parents:
+    #         directory_sizes[parent] += size
+    # return directory_sizes
