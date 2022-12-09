@@ -1,91 +1,63 @@
 from utils import read_input
 import math
-DAY = 8
+DAY = 9
 TEST = False
+ROPE_LENGTH = 2
+
+
+moveDict = {
+    'U': (0, 1),
+    'D': (0, -1),
+    'L': (-1, 0),
+    'R': (1, 0)
+}
 
 
 def parse(input_str: str):
-    trees = [[int(n) for n in list(line)] for line in input_str.split()]
-    return trees
+    data = [(line.split()[0], int(line.split()[1]))
+            for line in input_str.split('\n')]
+    return data
+
+
+def touching(x1, y1, x2, y2):
+    return abs(x1-x2) <= 1 and abs(y1-y2) <= 1
+
+
+def move(dx, dy, snake):
+    snake[0][0] += dx
+    snake[0][1] += dy
+
+    for i in range(1, ROPE_LENGTH):
+        hx, hy = snake[i-1]
+        tx, ty = snake[i]
+
+        if not touching(hx, hy, tx, ty):
+            sign_x = 0 if hx == tx else (hx-tx) / abs(hx-tx)
+            sign_y = 0 if hy == ty else (hy-ty) / abs(hy-ty)
+            tx += sign_x
+            ty += sign_y
+        snake[i] = [tx, ty]
+    return snake
 
 
 def part1(data):
-    visible = set()
-    # top to bottom
-    for i in range(len(data)):
-        max = -1
-        for j in range(len(data)):
-            if data[j][i] > max:
-                visible.add((j, i))
-                max = data[j][i]
-
-    # bottom to top
-    for i in range(len(data))[::-1]:
-        max = -1
-        for j in range(len(data))[::-1]:
-            if data[j][i] > max:
-                visible.add((j, i))
-                max = data[j][i]
-    # left to right
-    for i in range(len(data)):
-        max = -1
-        for j in range(len(data)):
-            if data[i][j] > max:
-                visible.add((i, j))
-                max = data[i][j]
-    # right to left
-    for i in range(len(data))[::-1]:
-        max = -1
-        for j in range(len(data))[::-1]:
-            if data[i][j] > max:
-                visible.add((i, j))
-                max = data[i][j]
-    return len(visible)
+    # change ROPE_LENGTH
+    pass
 
 
 def part2(data):
-    scenicScores = []
-    for i in range(len(data))[1:-1]:
-        for j in range(len(data))[1:-1]:
-            viewingAngles = []
-            # looking up
-            counter = 0
-            for k in range(1,i+1):
-                if data[i-k][j] >= data[i][j]:
-                    counter += 1
-                    break
-                else:
-                    counter += 1
-            viewingAngles.append(counter)
-            # looking down
-            counter = 0
-            for k in range(1,len(data)-i):
-                if data[i+k][j] >= data[i][j]:
-                    counter += 1
-                    break
-                else:
-                    counter += 1
-            viewingAngles.append(counter)
-            # looking left
-            counter = 0
-            for k in range(1,len(data)-j):
-                if data[i][j+k] >= data[i][j]:
-                    counter += 1
-                    break
-                else:
-                    counter += 1
-            viewingAngles.append(counter)
-            # looking right
-            counter = 0
-            for k in range(1,j+1):
-                if data[i][j-k] >= data[i][j]:
-                    counter += 1
-                    break
-                else:
-                    counter += 1
-            viewingAngles.append(counter)
-            scenicScores.append(math.prod(viewingAngles))
-    return max(scenicScores)
+    snake = [[0, 0] for _ in range(ROPE_LENGTH)]
+
+    tail_visited = set()
+    tail_visited.add(tuple(snake[-1]))
+
+    for dir, amount in data:
+        dx, dy = moveDict[dir]
+        for _ in range(amount):
+            snake = move(dx, dy, snake)
+            tail_visited.add(tuple(snake[-1]))
+    return (len(tail_visited))
+
 
 def main():
     input_str = read_input(day=DAY, test=TEST)
