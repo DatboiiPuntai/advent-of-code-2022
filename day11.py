@@ -8,7 +8,7 @@ TEST = False
 class Monkey:
     def __init__(self, items, op, value, div, true, false):
         self.items = items
-        self.op = op #[operator,value,divisible,true,false]
+        self.op = op 
         self.value = value
         self.div = div
         self.true = true
