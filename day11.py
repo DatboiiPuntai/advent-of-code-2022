@@ -16,9 +16,6 @@ class Monkey:
         self.actions=0
 
 def parse(input_str: str):
-    '''
-    Returns dict of monkes each represented by a dict with items: list, operation: str, test: int, ifTrue: int, ifFalse: int
-    '''
     monkes = []
     for m in input_str.split('\n\n'):
         _, a, b, c, d, e = m.split('\n')
