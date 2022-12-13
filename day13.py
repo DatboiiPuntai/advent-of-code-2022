@@ -1,91 +1,49 @@
 from utils import read_input
-import math
-DAY = 8
+import json
+from functools import cmp_to_key
+from pprint import pprint
+
+DAY = 13
 TEST = False
 
 
 def parse(input_str: str):
-    trees = [[int(n) for n in list(line)] for line in input_str.split()]
-    return trees
+    pairs = [pair.split('\n') for pair in input_str.split('\n\n')]
+
+    parsed = [list(map(json.loads, pair)) for pair in pairs]
+    return parsed
 
 
-def part1(data):
-    visible = set()
-    # top to bottom
-    for i in range(len(data)):
-        max = -1
-        for j in range(len(data)):
-            if data[j][i] > max:
-                visible.add((j, i))
-                max = data[j][i]
-
-    # bottom to top
-    for i in range(len(data))[::-1]:
-        max = -1
-        for j in range(len(data))[::-1]:
-            if data[j][i] > max:
-                visible.add((j, i))
-                max = data[j][i]
-    # left to right
-    for i in range(len(data)):
-        max = -1
-        for j in range(len(data)):
-            if data[i][j] > max:
-                visible.add((i, j))
-                max = data[i][j]
-    # right to left
-    for i in range(len(data))[::-1]:
-        max = -1
-        for j in range(len(data))[::-1]:
-            if data[i][j] > max:
-                visible.add((i, j))
-                max = data[i][j]
-    return len(visible)
+def part1(pairs):
+    counter = 0
+    for i, pair in enumerate(pairs):
+        left, right = pair
+        if rightOrder(left, right) < 0:
+            counter += i+1
+    return counter
 
 
-def part2(data):
-    scenicScores = []
-    for i in range(len(data))[1:-1]:
-        for j in range(len(data))[1:-1]:
-            viewingAngles = []
-            # looking up
-            counter = 0
-            for k in range(1,i+1):
-                if data[i-k][j] >= data[i][j]:
-                    counter += 1
-                    break
-                else:
-                    counter += 1
-            viewingAngles.append(counter)
-            # looking down
-            counter = 0
-            for k in range(1,len(data)-i):
-                if data[i+k][j] >= data[i][j]:
-                    counter += 1
-                    break
-                else:
-                    counter += 1
-            viewingAngles.append(counter)
-            # looking left
-            counter = 0
-            for k in range(1,len(data)-j):
-                if data[i][j+k] >= data[i][j]:
-                    counter += 1
-                    break
-                else:
-                    counter += 1
-            viewingAngles.append(counter)
-            # looking right
-            counter = 0
-            for k in range(1,j+1):
-                if data[i][j-k] >= data[i][j]:
-                    counter += 1
-                    break
-                else:
-                    counter += 1
-            viewingAngles.append(counter)
-            scenicScores.append(math.prod(viewingAngles))
-    return max(scenicScores)
+def rightOrder(left, right):
+    for i in range(min(len(left), len(right))):
+        if type(left[i]) == type(right[i]) == int:
+            if left[i] == right[i]:
+                continue
+            return left[i] - right[i]
+        ret = rightOrder(left[i] if type(left[i]) == list else [left[i]],
+                         right[i] if type(right[i]) == list else [right[i]])
+
+        if ret:
+            return ret
+    return len(left) - len(right)
+
+
+def part2(pairs):
+    items = [item for pair in pairs for item in pair]
+    items += [[[2]], [[6]]]
+    items = sorted(items, key=cmp_to_key(rightOrder))
+
+    return (items.index([[2]]) + 1) * (items.index([[6]]) + 1)
+
 
 def main():
     input_str = read_input(day=DAY, test=TEST)
