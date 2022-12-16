@@ -5,9 +5,6 @@ import numpy as np
 DAY = 14
 TEST = False
 
-COLS = 1000
-ROWS = 1000
-
 
 def parse(input_str: str):
     grid = defaultdict(lambda: '.')
