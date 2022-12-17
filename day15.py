@@ -1,66 +1,76 @@
 from utils import read_input
-from collections import defaultdict, deque
+from parse import *
 
 DAY = 15
-TEST = False
+TEST = True
 
 
-def display(startx, endx, starty, endy):
-    for y in range(starty, endy+1):
-        print("{:02d}".format(y), end=' ')
-        for x in range(startx, endx+1):
-            print(grid[(x, y)], end='')
-        print()
-    print()
+def parse(input_str: str):
+    sensors = []
+    beacons = []
+    for line in input_str.split('\n'):
+        sx = int(line.split()[2][2:-1])
+        sy = int(line.split()[3][2:-1])
+        bx = int(line.split()[8][2:-1])
+        by = int(line.split()[9][2:])
+        sensors.append((sx, sy))
+        beacons.append((bx, by))
+
+    return sensors, beacons
 
 
-def in_manhattan(x, y, d):
-    # paints all points within a certain points manhattan distance
-    # I know this is inefficient but I'm not very smart
-    queue = deque([(x, y)])
-    visited = set()
-    visited.add((x, y))
-    while queue:
-        xx, yy = queue.popleft()
-        for xxx, yyy in [[xx, yy+1], [xx+1, yy], [xx, yy-1], [xx-1, yy]]:
-            if (xxx, yyy) in visited: continue
-            if manhattan(x, y, xxx, yyy) < d:
-                queue.append((xxx, yyy))
-            visited.add((xxx, yyy))
-            if grid[(xxx, yyy)] == '.':
-                grid[(xxx, yyy)] = '#'
-        
+def dist(p1, p2):
+    return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
+
+# def interval_covering(start, stop, sorted_intervals, max_dim):
+#     for covering_interval in sorted_intervals:
+#         if stop >= max_dim:
+#             return max_dim - (stop + 1)
+#         if stop + 1 < covering_interval[0]:
+#             return stop + 1
+#         if (interval_right := covering_interval[1]) > stop:
+#             stop = interval_right
+#     return -1
 
 
-def manhattan(x1, y1, x2, y2):
-    return abs(x2-x1) + abs(y2-y1)
 
-
-input_str = read_input(day=DAY, test=TEST)
-grid = defaultdict(lambda: '.')
-for line in input_str.split('\n'):
-    l = line.split(' ')
-    sx = int(l[2][2:-1])
-    sy = int(l[3][2:-1])
-    bx = int(l[8][2:-1])
-    by = int(l[9][2:])
-    mh = manhattan(sx, sy, bx, by)
-    for dy, dx in ((-mh, 0),(mh, -0)):
-        cy = sy + dy
-        
-    grid[(sx, sy)] = 'S'
-    grid[(bx, by)] = 'B'
+def row_inspector(sensors, beacons, Y):
     
-    in_manhattan(sx, sy, dist)
-    display(-2, 25, 0, 22)
+    dists = []
+    for i in range(len(sensors)):
+        dists.append(dist(sensors[i], beacons[i]))
     
-counter = 0
-for x in range(-1000,1000):
-    if grid[(x,10)] != '.':
-        counter+=1
-print(counter)
+    intervals = []
+    for i, s in enumerate(sensors):
+        dx = dists[i] - abs(s[1]-Y)
+        if dx <=0:
+            continue
+        intervals.append((s[0] - dx, s[0] + dx))
+    
+
+    allowed_x = []
+    for bx, by in beacons:
+        if by == Y:
+            allowed_x.append(bx)
+    
+    min_x = min(i[0] for i in intervals)
+    max_x = max(i[1] for i in intervals)
+    ans = 0
+    for x in range(min_x, max_x+1):
+        if x in allowed_x:
+            continue
+        for left, right in intervals:
+            if left <= x <= right:
+                ans += 1
+                break
+    return ans
 
 
+def main():
+    input_str = read_input(day=DAY, test=TEST)
+    sensors, beacons = parse(input_str)
+    print(row_inspector(sensors, beacons, 10))
 
-def part2(grid):
-    pass
+
+if __name__ == "__main__":
+    main()
