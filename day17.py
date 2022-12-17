@@ -72,4 +72,5 @@ while resting_rocks < 2022:
 				break
 		else:
 			shape = new_shape
+
 print("part 1:", highest_rock+1)
