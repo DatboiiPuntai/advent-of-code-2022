@@ -2,7 +2,7 @@ from utils import read_input
 from parse import *
 
 DAY = 15
-TEST = True
+TEST = False
 
 
 def parse(input_str: str):
@@ -22,17 +22,8 @@ def parse(input_str: str):
 def dist(p1, p2):
     return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
 
-# def interval_covering(start, stop, sorted_intervals, max_dim):
-#     for covering_interval in sorted_intervals:
-#         if stop >= max_dim:
-#             return max_dim - (stop + 1)
-#         if stop + 1 < covering_interval[0]:
-#             return stop + 1
-#         if (interval_right := covering_interval[1]) > stop:
-#             stop = interval_right
-#     return -1
-
-
+def tuning_frequency(x, y):
+    return x*4000000 + y
 
 def row_inspector(sensors, beacons, Y):
     
@@ -69,7 +60,7 @@ def row_inspector(sensors, beacons, Y):
 def main():
     input_str = read_input(day=DAY, test=TEST)
     sensors, beacons = parse(input_str)
-    print(row_inspector(sensors, beacons, 10))
+    print(row_inspector(sensors, beacons, 2000000))
 
 
 if __name__ == "__main__":
