@@ -14,12 +14,13 @@ class Node:
         self.prev = prev
         self.next = next
 
+
 r = []
 input_str = read_input(day=DAY, test=TEST)
 for l in input_str.splitlines():
     r.append(Node(int(l)))
 
-for a, b in zip(r,r[1:]):
+for a, b in zip(r, r[1:]):
     a.next = b
     b.prev = a
 r[-1].next = r[0]
@@ -29,11 +30,11 @@ for x in r:
     # split the circular thing
     x.prev.next = x.next
     x.next.prev = x.prev
-    a,b = x.prev, x.next
+    a, b = x.prev, x.next
 
     for _ in range(x.value % (len(r) - 1)):
-        a=a.next
-        b=b.next
+        a = a.next
+        b = b.next
     a.next = x
     x.prev = a
     b.prev = x
@@ -50,13 +51,13 @@ for x in r:
         print(total)
 
 
-# part 2 
+# part 2
 r = []
 for l in input_str.splitlines():
     n = 811589153 * int(l)
     r.append(Node(n))
 
-for a, b in zip(r,r[1:]):
+for a, b in zip(r, r[1:]):
     a.next = b
     b.prev = a
 r[-1].next = r[0]
@@ -67,11 +68,11 @@ for _ in range(10):
     for x in r:
         x.prev.next = x.next
         x.next.prev = x.prev
-        a,b = x.prev, x.next
+        a, b = x.prev, x.next
 
         for _ in range(x.value % (len(r) - 1)):
-            a=a.next
-            b=b.next
+            a = a.next
+            b = b.next
         a.next = x
         x.prev = a
         b.prev = x
