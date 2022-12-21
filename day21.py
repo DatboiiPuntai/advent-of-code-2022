@@ -1,5 +1,5 @@
 from utils import read_input
-import z3
+import sympy
 
 DAY = 21
 TEST = False
@@ -9,13 +9,12 @@ input_str = read_input(day=DAY, test=TEST)
 
 monkes = {}
 for line in input_str.splitlines():
-    x = line.split(': ')
-    name = x[0]
-    if len(x[1].split()) > 1:
-        monkes[name] = x[1].split()
+    name, expr = line.split(': ')
+    if expr.isdigit():
+        monkes[name] = int(expr)
     else:
-        monkes[name] = int(x[1])
-
+        monkes[name] = expr.split()
+        
 
 def solve1(root):
     if type(monkes[root]) is int:
@@ -26,52 +25,29 @@ def solve1(root):
 print(solve1('root'))
 
 
+ops = {
+    "+": lambda x, y: x + y,
+    "-": lambda x, y: x - y,
+    "*": lambda x, y: x * y,
+    "/": lambda x, y: x / y,
+}
+
 # part 2
-solver = z3.Optimize()
+del monkes
+monkes = {'humn': sympy.Symbol('x')}
 
-monkeys = {}
-
-for monkey in input_str.splitlines():
-    name, op = monkey.split(": ")
-
-    if name == "humn":
-        continue
-    elif name == "root":
-        m1, _, m2 = op.split(" ")
-        m1 = monkeys.setdefault(m1, z3.Int(m1))
-        m2 = monkeys.setdefault(m2, z3.Int(m2))
-        solver.add(m1 == m2)
-        continue
-
-    match (op.split(" ")):
-        case [n]:
-            m = monkeys.setdefault(name, z3.Int(name))
-            solver.add(m == n)
-        case [m1, "+", m2]:
-            m = monkeys.setdefault(name, z3.Int(name))
-            m1 = monkeys.setdefault(m1, z3.Int(m1))
-            m2 = monkeys.setdefault(m2, z3.Int(m2))
-            solver.add(m == (m1 + m2))
-        case [m1, "-", m2]:
-            m = monkeys.setdefault(name, z3.Int(name))
-            m1 = monkeys.setdefault(m1, z3.Int(m1))
-            m2 = monkeys.setdefault(m2, z3.Int(m2))
-            solver.add(m == (m1 - m2))
-        case [m1, "*", m2]:
-            m = monkeys.setdefault(name, z3.Int(name))
-            m1 = monkeys.setdefault(m1, z3.Int(m1))
-            m2 = monkeys.setdefault(m2, z3.Int(m2))
-            solver.add(m == (m1 * m2))
-        case [m1, "/", m2]:
-            m = monkeys.setdefault(name, z3.Int(name))
-            m1 = monkeys.setdefault(m1, z3.Int(m1))
-            m2 = monkeys.setdefault(m2, z3.Int(m2))
-            solver.add(m2 != 0)
-            solver.add(m == (m1 / m2))
-
-if solver.check() != z3.sat:
-    raise Exception
-
-humn = monkeys["humn"]
-model = solver.model()
-print(model[humn].as_long())
+x = [line.strip() for line in input_str.splitlines()]
+for a in x:
+    name, expr = a.split(': ')
+    if name in monkes: continue
+    if expr.isdigit():
+        monkes[name] = int(expr)
+    else:
+        left, op, right = expr.split()
+        if left in monkes and right in monkes:
+            if name == 'root':
+                print(round(sympy.solve(monkes[left] - monkes[right])[0]))
+                break
+            monkes[name] = ops[op](monkes[left], monkes[right])
+        else:
+            x.append(a)
