@@ -1,67 +1,103 @@
 from utils import read_input
-from parse import *
+import re
 
 DAY = 15
 TEST = False
 
+def dist(sx, sy, bx, by):
+        return abs(sx - bx) + abs(sy - by)
 
-def parse(input_str: str):
-    sensors = []
-    beacons = []
-    for line in input_str.split('\n'):
-        sx = int(line.split()[2][2:-1])
-        sy = int(line.split()[3][2:-1])
-        bx = int(line.split()[8][2:-1])
-        by = int(line.split()[9][2:])
-        sensors.append((sx, sy))
-        beacons.append((bx, by))
+def part1():
+    Y = 10 if TEST else 2000000
 
-    return sensors, beacons
-
-
-def dist(p1, p2):
-    return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
-
-def tuning_frequency(x, y):
-    return x*4000000 + y
-
-def row_inspector(sensors, beacons, Y):
-    
-    dists = []
-    for i in range(len(sensors)):
-        dists.append(dist(sensors[i], beacons[i]))
-    
+    known = set()
     intervals = []
-    for i, s in enumerate(sensors):
-        dx = dists[i] - abs(s[1]-Y)
-        if dx <=0:
-            continue
-        intervals.append((s[0] - dx, s[0] + dx))
-    
 
-    allowed_x = []
-    for bx, by in beacons:
-        if by == Y:
-            allowed_x.append(bx)
-    
-    min_x = min(i[0] for i in intervals)
-    max_x = max(i[1] for i in intervals)
-    ans = 0
-    for x in range(min_x, max_x+1):
-        if x in allowed_x:
-            continue
-        for left, right in intervals:
-            if left <= x <= right:
-                ans += 1
-                break
-    return ans
-
-
-def main():
     input_str = read_input(day=DAY, test=TEST)
-    sensors, beacons = parse(input_str)
-    print(row_inspector(sensors, beacons, 2000000))
+    for line in input_str.splitlines():
+        sx, sy, bx, by = map(int, re.findall(r'-?\d+', line))
+        d = dist(sx, sy, bx, by)
+        o = d - abs(sy - Y)
+
+        if o < 0:
+            continue
+
+        lx = sx - o
+        hx = sx + o
+        intervals.append([lx, hx])
+
+        if by == Y:
+            known.add(bx)
+
+    intervals.sort()
+
+    q = []
+    for lo, hi in intervals:
+        if not q:
+            q.append([lo, hi])
+            continue
+
+        qlo, qhi = q[-1]
+
+        if lo > qhi + 1:
+            q.append([lo, hi])
+            continue
+
+        q[-1][1] = max(qhi, hi)
+
+    cannot = set()
+    for lo, hi in q:
+        for x in range(lo, hi+1):
+            cannot.add(x)
+
+    print(len(cannot - known))
+
+def part2():
+    
+    input_str = read_input(day=DAY, test=TEST)
+    lines = [list(map(int, re.findall(r'-?\d+', line))) for line in input_str.splitlines()]
+    M = 20 if TEST else 4000000
 
 
-if __name__ == "__main__":
-    main()
+    for Y in range(M+1):
+        intervals = []
+        for sx, sy, bx, by in lines:
+            d = dist(sx, sy, bx, by)
+            o = d - abs(sy - Y)
+
+            if o < 0:
+                continue
+
+            lx = sx - o
+            hx = sx + o
+            intervals.append([lx, hx])
+
+        intervals.sort()
+
+        q = []
+        for lo, hi in intervals:
+            if not q:
+                q.append([lo, hi])
+                continue
+
+            qlo, qhi = q[-1]
+
+            if lo > qhi + 1:
+                q.append([lo, hi])
+                continue
+
+            q[-1][1] = max(qhi, hi)
+        
+        x = 0
+        for lo, hi in q:
+            if x < lo:
+                print(x * 4000000 + Y)
+                exit(0)
+            else:
+                x = hi + 1
+            if x > M:
+                break
+
+
+# part1()
+part2()
